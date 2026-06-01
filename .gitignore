@@ -1,0 +1,64 @@
+```gitignore
+# ===== LaTeX =====
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.nav
+*.snm
+*.vrb
+*.lof
+*.lot
+*.idx
+*.ind
+*.ilg
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+*.whl
+
+# ===== Entornos virtuales =====
+venv/
+env/
+.venv/
+.env/
+
+# ===== Jupyter Notebooks =====
+.ipynb_checkpoints/
+*.ipynb
+
+# ===== Sistema Operativo =====
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# ===== IDEs =====
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ===== Archivos temporales =====
+*.tmp
+*.bak
+*.orig
+
+# ===== NO ignorar (archivos importantes) =====
+!paper/*.pdf
+!data/**/*.csv
+!figures/*.png

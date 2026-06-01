@@ -1,6 +1,6 @@
 import random
-from collatz_entropy_analysis import analyze_range, is_near_alternating, has_block_pattern
-from entropy_tools import binary_entropy
+from scripts.collatz_entropy_analysis import analyze_range, is_near_alternating, has_block_pattern
+from scripts.entropy_tools import binary_entropy
 
 random.seed(42)  # Reproducibilidad
 

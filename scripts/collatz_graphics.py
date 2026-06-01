@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from collatz_entropy_analysis import collatz_steps
+from scripts.collatz_entropy_analysis import collatz_steps
 import random
 
 # Semilla para reproducibilidad

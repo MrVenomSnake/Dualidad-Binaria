@@ -1,5 +1,5 @@
 import random
-from collatz_entropy_analysis import analyze_range
+from scripts.collatz_entropy_analysis import analyze_range
 
 # Semilla para reproducibilidad
 random.seed(42)
