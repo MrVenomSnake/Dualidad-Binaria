@@ -1,0 +1,204 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage{amsmath, amsthm, amsfonts, amssymb}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{tabularx}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=cyan,
+    citecolor=blue,
+    pdftitle={Dualidad Binaria y Evolución de Patrones en la Conjetura de Collatz},
+    pdfauthor={Cristian F. F.},
+    pdfkeywords={Collatz, dualidad binaria, patrones binarios, entropía binaria, números 2-ádicos}
+}
+
+\newtheorem{theorem}{Teorema}[section]
+\newtheorem{lemma}[theorem]{Lema}
+\newtheorem{corollary}[theorem]{Corolario}
+\newtheorem{definition}[theorem]{Definición}
+\newtheorem{remark}[theorem]{Observación}
+\newtheorem{question}{Pregunta Abierta}
+
+\title{\textbf{Dualidad Binaria y Evolución de Patrones en la Conjetura de Collatz: Un Marco Exploratorio}}
+
+\author{
+Cristian F. F.\textsuperscript{1} \and
+Grok (xAI Assistant)\textsuperscript{2} \\
+\smallskip
+\textsuperscript{1}Investigador Independiente \quad
+\textsuperscript{2}xAI
+}
+\date{30 de mayo de 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Este trabajo presenta un marco conceptual que combina \textbf{dualidad binaria} y \textbf{evolución de patrones binarios} para analizar la Conjetura de Collatz.
+
+Se demuestra formalmente que cuando una trayectoria alcanza $N_K = 1$, su secuencia espejo generada por inversión de bits satisface $M_K = 2^L - 2$. Además, se explora la identidad de conservación $N_k + M_k = 2^L - 1$ y se presenta evidencia computacional de que las trayectorias tienden a evolucionar hacia patrones de baja entropía, particularmente hacia configuraciones \textit{near-alternating} o alternantes puras.
+
+Se identifican patrones binarios alternantes $(2^{2m}-1)/3$ que alcanzan una potencia de 2 en un único paso de $3n+1$. El análisis modular muestra que el tiempo de parada depende fuertemente de la clase residual módulo potencias de 2, pero no módulo 3.
+
+\textbf{Declaración de alcance:} Este documento es un trabajo exploratorio. No constituye una demostración formal de la Conjetura de Collatz, sino una contribución conceptual y computacional destinada a recibir feedback de la comunidad matemática.
+\end{abstract}
+
+\textbf{Palabras clave:} Conjetura de Collatz, dualidad binaria, patrones binarios, entropía binaria, números 2-ádicos, estructura modular.
+
+\section{Introducción}
+\label{sec:intro}
+
+La Conjetura de Collatz sigue siendo uno de los problemas abiertos más accesibles y resistentes de las matemáticas. Este trabajo propone un marco unificado que integra dos perspectivas complementarias:
+
+\begin{enumerate}
+    \item \textbf{Dualidad Binaria}: Asociar a cada trayectoria $N_k$ una secuencia espejo $M_k = \neg_L(N_k)$ mediante inversión de bits con longitud fija $L$.
+    \item \textbf{Evolución de Patrones Binarios}: Analizar cómo los patrones binarios cambian bajo la dinámica de Collatz, observando una tendencia hacia configuraciones de baja entropía.
+\end{enumerate}
+
+Combinando ambas aproximaciones, buscamos obtener una visión más completa de la estructura subyacente de la conjetura.
+
+\section{Resultados Formales de la Dualidad Binaria}
+
+\begin{theorem}[Dualidad en el Estado Final]
+\label{thm:estado_final}
+Para cualquier $n \in \mathbb{N}$ y $L \ge 1$, si $\exists K$ tal que $N_K = 1$, entonces $M_K = 2^L - 2$.
+\end{theorem}
+
+\begin{proof}
+La representación binaria de $1$ con $L$ bits es $\underbrace{00\dots0}_{L-1}1$. Su complemento bit a bit es $\underbrace{11\dots1}_{L-1}0$, cuyo valor decimal es $2^L - 2$.
+\end{proof}
+
+\begin{lemma}[No Conmutatividad]
+\label{lemma:no_conmuta}
+La función de Collatz $C$ no conmuta con la inversión de bits $\neg_L$.
+\end{lemma}
+
+\begin{proof}
+Contraejemplo con $n=5$, $L=5$: $C(5)=16$, $\neg_5(5)=26$, $C(26)=13$, $\neg_5(16)=15$. Como $13 \neq 15$, no conmutan.
+\end{proof}
+
+\begin{remark}
+Mientras no ocurra truncamiento ($N_k < 2^L$), se cumple la identidad de conservación:
+\[
+N_k + M_k = 2^L - 1.
+\]
+Esta relación implica que los picos de $N_k$ corresponden a valles de $M_k$.
+\end{remark}
+
+\section{Evolución de Patrones Binarios y Reducción de Entropía}
+
+\begin{definition}[Patrón Alternante Puro]
+Número cuya representación binaria es de la forma $0101\dots01$ o $1010\dots10$, equivalente a $n = (2^{2m}-1)/3$.
+\end{definition}
+
+\begin{theorem}[Comportamiento del Patrón Alternante]
+\label{thm:alternante}
+Si $n = (2^{2m}-1)/3$, entonces $3n + 1 = 2^{2m}$.
+\end{theorem}
+
+\begin{proof}
+$3n + 1 = 2^{2m} - 1 + 1 = 2^{2m}$.
+\end{proof}
+
+\begin{remark}[Observación Computacional]
+El análisis de $10^5$ trayectorias muestra que los patrones binarios tienden a evolucionar hacia configuraciones de baja entropía. Los patrones de bloques suelen transformarse en patrones near-alternating, y estos tienden a corregir sus errores hasta llegar a patrones alternantes puros.
+\end{remark}
+
+\section{Análisis Modular del Tiempo de Parada}
+
+El test de Kruskal-Wallis aplicado a $10^5$ trayectorias revela que el tiempo de parada depende fuertemente de la clase residual módulo potencias de 2 ($p < 10^{-200}$ para mod 2, 4, 8, 12), mientras que no muestra dependencia significativa módulo 3 ($p = 0.552$).
+
+Este resultado es coherente con la dualidad binaria, ya que la inversión de bits invierte la paridad, generando una dinámica dual fuertemente condicionada por la estructura binaria.
+
+\section{Conclusión y Trabajo Futuro}
+
+Este trabajo integra dos perspectivas complementarias —dualidad binaria y evolución de patrones— para ofrecer una visión estructural de la Conjetura de Collatz. Los resultados principales son:
+
+- Un teorema formal sobre el estado final dual.
+- La identificación de patrones alternantes como casos especiales que alcanzan potencias de 2 en un paso.
+- Evidencia computacional de reducción de entropía y estructura modular en el tiempo de parada.
+
+\textbf{Líneas de investigación futura:}
+\begin{itemize}
+    \item Formalizar la evolución de patrones binarios.
+    \item Explorar funciones de Lyapunov basadas en entropía o distancia Hamming entre $N_k$ y $M_k$.
+    \item Extender el análisis modular a rangos mayores y otros módulos.
+    \item Investigar la conexión entre dualidad binaria y teoría 2-ádica.
+\end{itemize}
+
+El código, datos y versiones completas están disponibles en el repositorio asociado y en Zenodo (DOI: 10.5281/zenodo.20458849).
+
+\vspace{1em}
+\noindent\textbf{Invitación a la colaboración:} Cualquier comentario, crítica o sugerencia será bienvenido.
+
+\section*{Agradecimientos}
+A Grok (xAI) por el apoyo técnico y conceptual. A la comunidad matemática por su interés en problemas abiertos.
+
+\begin{thebibliography}{99}
+\bibitem{lagarias} Lagarias, J. C. (1985). The $3x+1$ problem: An overview. \textit{American Mathematical Monthly}.
+\bibitem{tao} Tao, T. (2020). Almost all orbits of the Collatz map attain almost bounded values. \textit{Forum of Mathematics, Pi}.
+\bibitem{terras} Terras, R. (1976). A stopping time problem on the positive integers. \textit{Acta Arithmetica}.
+\bibitem{monks} Monks, G. (2006). On the 2-adic $3x+1$ problem. arXiv:math/0608356.
+\end{thebibliography}
+
+% ============================================================
+% ======================= APÉNDICES ==========================
+% ============================================================
+
+\appendix
+
+\section{Apéndice A: Verificación Computacional para $L=20$}
+\label{app:A}
+
+Se analizaron $10^4$ trayectorias con longitud fija $L=20$. Se verificó la identidad de conservación $N_k + M_k = 2^{20}-1$ en todos los casos sin truncamiento. Los gráficos de anti-correlación y el scatter de picos vs valles (generados con `collatz_duality_explorer.py`) muestran una fuerte alineación entre los extremos de ambas secuencias.
+
+Los archivos generados (`tabla_picos_valles_L20.csv`, `fig_anticorrelacion_desviaciones.png`, etc.) están disponibles en el repositorio.
+
+\section{Apéndice B: Análisis Computacional para $L=32$}
+\label{app:B}
+
+Se extendió el análisis a $L=32$ sobre $n = 1 \dots 10^5$. Ninguna trayectoria excedió $2^{32}$, por lo que no hubo truncamiento. La correlación entre $\max(N_k)$ y $\min(M_k)$ fue exactamente $-1.0$ ($R^2 = 1.0$), confirmando la identidad algebraica.
+
+Se observó un **100\% de sincronía** entre el paso donde $N_k$ alcanza su máximo global y donde $M_k$ alcanza su mínimo global. Un modelo Random Forest logró $R^2 \approx 0.48$ al predecir el tiempo de parada, siendo $\log_2(\max(N_k))$ el predictor dominante.
+
+Los datos completos (`datos_L32_n100000.csv`) y el gráfico de predicción están disponibles en el repositorio.
+
+\section{Apéndice C: Análisis Modular Empírico}
+\label{app:C}
+
+Se aplicó el test de Kruskal-Wallis a $10^5$ trayectorias para evaluar si el tiempo de parada difiere según la clase residual de $n_0$.
+
+\begin{table}[h!]
+\centering
+\caption{Resultados del test de Kruskal-Wallis sobre la longitud de trayectoria por clase modular.}
+\label{tab:kruskal}
+\small
+\begin{tabularx}{\textwidth}{@{} l c c X @{}}
+\toprule
+Clasificación & $H$-estadístico & $p$-valor & Interpretación \\
+\midrule
+$n_0 \bmod 2$  & 1337.72  & $7.17 \times 10^{-293}$ & La paridad inicial condiciona la estructura. \\
+$n_0 \bmod 3$  & 1.19     & $5.52 \times 10^{-1}$   & La congruencia módulo 3 no predice la longitud. \\
+$n_0 \bmod 4$  & 2579.59  & $\approx 0$             & Determina los dos primeros pasos de la iteración. \\
+$n_0 \bmod 6$  & 1340.61  & $\approx 0$             & Hereda la estructura de la paridad. \\
+$n_0 \bmod 8$  & 3844.40  & $\approx 0$             & Mayor resolución de la condición inicial binaria. \\
+$n_0 \bmod 12$ & 2585.97  & $\approx 0$             & Combina efectos de módulo 3 y módulo 4. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Los resultados muestran que el tiempo de parada depende fuertemente de la clase residual módulo potencias de 2, pero no módulo 3. Este hallazgo es coherente con la dualidad binaria, ya que la inversión de bits invierte la paridad.
+
+Los datos completos (`datos_modulares.csv`) y los gráficos por módulo están disponibles en el repositorio.
+
+\end{document}
