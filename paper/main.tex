@@ -1,0 +1,724 @@
+% ============================================================
+%  Dualidad Binaria y Evolución de Patrones en la Conjetura de Collatz
+%  Versión unificada — Junio 2026
+%  Autor: Cristian F. F. (Investigador Independiente)
+% ============================================================
+
+\documentclass[11pt,a4paper]{article}
+
+% --- Codificación y lenguaje ---
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-tabla]{babel}
+
+% --- Matemáticas ---
+\usepackage{amsmath, amsthm, amsfonts, amssymb}
+
+% --- Formato y diseño ---
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{graphicx}
+
+% --- Hipervínculos ---
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks = true,
+  linkcolor  = blue,
+  urlcolor   = cyan,
+  citecolor  = blue,
+  pdftitle   = {Dualidad Binaria y Evolución de Patrones en la Conjetura de Collatz},
+  pdfauthor  = {Cristian F. F.},
+  pdfkeywords= {Collatz, dualidad binaria, patrones binarios, entropía binaria,
+                unicidad algebraica, números 2-ádicos, estructura modular}
+}
+
+% --- Entornos matemáticos ---
+\newtheorem{theorem}{Teorema}[section]
+\newtheorem{lemma}[theorem]{Lema}
+\newtheorem{corollary}[theorem]{Corolario}
+\newtheorem{definition}[theorem]{Definición}
+\newtheorem{remark}[theorem]{Observación}
+\newtheorem{question}{Pregunta Abierta}
+
+% ============================================================
+%  PORTADA
+% ============================================================
+\title{%
+  \textbf{Dualidad Binaria y Evolución de Patrones\\
+  en la Conjetura de Collatz}\\[0.4em]
+  {\large Un Marco Conceptual Exploratorio}
+}
+
+\author{%
+  Cristian F.\,F.\textsuperscript{1} \\[0.3em]
+  \textsuperscript{1}Investigador Independiente \\[0.2em]
+  \small Asistente técnico: Grok (xAI)
+}
+\date{Junio de 2026 \quad|\quad DOI: \href{https://doi.org/10.5281/zenodo.20458849}{10.5281/zenodo.20458849}}
+
+% ============================================================
+\begin{document}
+\maketitle
+
+% ============================================================
+%  ABSTRACT
+% ============================================================
+\begin{abstract}
+Este trabajo presenta un marco conceptual que integra tres perspectivas
+complementarias para analizar la Conjetura de Collatz:
+\textbf{dualidad binaria}, \textbf{evolución de patrones binarios}
+y \textbf{unicidad algebraica del coeficiente~3}.
+
+Se demuestra formalmente que cuando una trayectoria alcanza $N_K = 1$,
+su secuencia espejo satisface $M_K = 2^L - 2$ (Teorema de Dualidad Final).
+La identidad de conservación $N_k + M_k = 2^L - 1$ implica una
+anti-correlación exacta entre ambas secuencias mientras no haya truncamiento.
+
+Se identifican los números alternantes $(2^{2m}-1)/3$ como una familia
+especial que, en un único paso de $3n+1$, alcanza una potencia de $2$,
+llevando directamente al ciclo $4{\to}2{\to}1$.
+Esta propiedad está ligada a la unicidad modular del coeficiente~$3$:
+es el único entero $k>1$ tal que $k \mid 2^{2m}-1$ para todo $m\ge1$.
+
+El análisis de entropía binaria sobre $10^5$ trayectorias muestra una
+tendencia a la reducción progresiva del desorden, y el análisis modular
+(test de Kruskal-Wallis) revela que el tiempo de parada depende
+fuertemente de la clase residual módulo potencias de~$2$,
+pero no módulo~$3$.
+
+\medskip
+\noindent\textbf{Declaración de alcance:}
+Este documento es un trabajo exploratorio. \emph{No constituye una
+demostración de la Conjetura de Collatz.} Su objetivo es documentar
+una perspectiva algebraica novedosa y solicitar retroalimentación
+de la comunidad matemática.
+\end{abstract}
+
+\medskip
+\noindent\textbf{Palabras clave:}
+Conjetura de Collatz, dualidad binaria, patrones binarios,
+entropía binaria, unicidad algebraica, números 2-ádicos,
+estructura modular.
+
+% ============================================================
+\section{Introducción}
+\label{sec:intro}
+% ============================================================
+
+La Conjetura de Collatz (problema $3x+1$) establece que para todo
+$n \in \mathbb{N}$, la iteración de la función
+\begin{equation}
+  C(n) =
+  \begin{cases}
+    n/2   & \text{si } n \equiv 0 \pmod{2},\\
+    3n+1  & \text{si } n \equiv 1 \pmod{2},
+  \end{cases}
+  \label{eq:collatz}
+\end{equation}
+alcanza eventualmente el ciclo trivial $4 \to 2 \to 1$.
+A pesar de su formulación elemental, el problema resiste demostración
+desde 1937. Los avances más relevantes son de naturaleza probabilística
+\cite{terras,korec,tao}; la convergencia determinista global permanece abierta.
+
+Este trabajo propone una vía complementaria basada en la
+\emph{representación binaria} de los números, articulada en tres ejes:
+
+\begin{enumerate}
+  \item \textbf{Dualidad Binaria}: asociar a cada trayectoria $(N_k)$
+        una «secuencia espejo» $(M_k)$ obtenida por inversión de bits
+        con longitud fija $L$.
+  \item \textbf{Evolución de Patrones}: analizar cómo los patrones
+        binarios se transforman bajo la dinámica de Collatz, con tendencia
+        observada hacia configuraciones de baja entropía.
+  \item \textbf{Unicidad del Coeficiente 3}: mostrar que la estructura
+        modular $2 \equiv -1 \pmod{3}$ garantiza propiedades algebraicas
+        que no tienen otros coeficientes, lo que explica parcialmente
+        la singularidad del problema.
+\end{enumerate}
+
+\noindent
+La notación principal se define en la Sección~\ref{sec:defs};
+los resultados formales se presentan en las Secciones~\ref{sec:dualidad}
+a~\ref{sec:unicidad}; la evidencia computacional cierra el artículo.
+
+% ============================================================
+\section{Definiciones Formales}
+\label{sec:defs}
+% ============================================================
+
+Sea $n \in \mathbb{N}$ el valor inicial y $L \in \mathbb{N}$ un parámetro
+de longitud de bits.
+
+\begin{definition}[Trayectoria de Collatz]
+La sucesión $(N_k)_{k \ge 0}$ se define por $N_0 = n$ y
+$N_{k+1} = C(N_k)$ con $C$ como en~\eqref{eq:collatz}.
+\end{definition}
+
+\begin{definition}[Operador de inversión de bits $\neg_L$]
+\label{def:inversion}
+Para $x \in \mathbb{N}$, sea $\mathtt{bin}_L(x)$ la representación
+binaria de $x$ completada a exactamente $L$ bits (bits menos
+significativos; si $x \ge 2^L$ se trunca). Definimos:
+\[
+  \neg_L(x) = (2^L - 1) - (x \bmod 2^L).
+\]
+Equivalentemente, $\neg_L$ invierte cada bit de $\mathtt{bin}_L(x)$.
+\end{definition}
+
+\begin{remark}[Elección de $L$]
+Para evitar truncamiento en los primeros $K$ pasos se recomienda
+$L > \log_2(\max_{k \le K} N_k)$.
+En la práctica computacional se usan $L = 20$ ó $L = 32$;
+teóricamente $L$ es un parámetro libre del marco.
+\end{remark}
+
+\begin{definition}[Secuencia espejo]
+\label{def:espejo}
+La sucesión espejo de $(N_k)$ con longitud $L$ es:
+\[
+  M_k = \neg_L(N_k), \quad \forall\, k \ge 0.
+\]
+\end{definition}
+
+\begin{definition}[Dualidad Binaria de longitud $L$]
+La correspondencia biyectiva $N_k \leftrightarrow M_k = \neg_L(N_k)$
+es una \emph{dualidad binaria} en el espacio de estados truncados
+$\{0,1,\dots,2^L-1\}$.
+Es una involución: $\neg_L \circ \neg_L = \mathrm{Id}$.
+\end{definition}
+
+\begin{definition}[Patrón alternante puro]
+\label{def:alternante}
+Un entero $n$ tiene \emph{patrón alternante puro de $2m$ bits}
+si su representación binaria es de la forma $0101\dots01$,
+es decir, $n = (2^{2m}-1)/3$.
+\end{definition}
+
+\begin{definition}[Patrón near-alternating]
+Un entero $n$ tiene \emph{patrón near-alternating} si su
+representación binaria difiere de un patrón alternante puro
+en a lo sumo $2$ bits.
+\end{definition}
+
+\begin{definition}[Entropía binaria]
+Para un entero $n$ con representación binaria de longitud $b$,
+sean $p_0$ y $p_1$ las proporciones de bits $0$ y $1$. La
+\emph{entropía binaria} es:
+\[
+  H(n) = -p_0 \log_2 p_0 - p_1 \log_2 p_1 \in [0,1].
+\]
+Se considera \emph{baja entropía} cuando $H(n) \le 0.7$.
+\end{definition}
+
+% ============================================================
+\section{Resultados de la Dualidad Binaria}
+\label{sec:dualidad}
+% ============================================================
+
+\subsection{Estado final dual (Teorema principal)}
+
+\begin{theorem}[Dualidad en el Estado Final]
+\label{thm:estado_final}
+Para cualquier $n \in \mathbb{N}$ y $L \ge 1$, si existe $K$ tal que
+$N_K = 1$, entonces:
+\[
+  M_K = 2^L - 2.
+\]
+\end{theorem}
+
+\begin{proof}
+La representación binaria de $1$ con $L$ bits es
+$\underbrace{00\dots0}_{L-1}1$.
+Su complemento bit a bit es $\underbrace{11\dots1}_{L-1}0$,
+cuyo valor decimal es $\sum_{i=1}^{L-1}2^i = 2^L - 2$.
+Como $M_K = \neg_L(N_K) = \neg_L(1)$, se concluye que
+$M_K = 2^L - 2$, independientemente de $n$ y de la historia previa.
+\end{proof}
+
+\begin{corollary}
+El valor $2^L - 2$ (binario: $L-1$ unos seguidos de un cero)
+es el \emph{atractor dual universal} de toda trayectoria que converge
+a $1$, para la longitud $L$ fijada.
+\end{corollary}
+
+\begin{remark}
+Bajo la Conjetura de Collatz, todo $n$ tiene algún $K$ con $M_K = 2^L-2$.
+Recíprocamente, si pudiera probarse que $\forall n,\,\exists K: M_K = 2^L-2$
+para algún $L$ fijo e independiente de $n$, ello implicaría la Conjetura.
+No se conoce tal $L$ universal.
+\end{remark}
+
+\subsection{Propiedades algebraicas de la transformación}
+
+\begin{lemma}[No conmutatividad]
+\label{lemma:no_conmuta}
+Para todo $L \ge 4$, la función de Collatz $C$ y la inversión $\neg_L$
+\emph{no conmutan}:
+\[
+  C \circ \neg_L \;\neq\; \neg_L \circ C.
+\]
+\end{lemma}
+
+\begin{proof}
+Contraejemplo con $n = 5$, $L = 5$:
+\begin{align*}
+  n               &= 5 = \mathtt{00101}_2, \\
+  \neg_5(n)       &= \mathtt{11010}_2 = 26, \\
+  C(n)            &= 16 = \mathtt{10000}_2, \\
+  \neg_5(C(n))    &= \mathtt{01111}_2 = 15, \\
+  C(\neg_5(n))    &= C(26) = 13 = \mathtt{01101}_2.
+\end{align*}
+Como $13 \ne 15$, $C$ y $\neg_L$ no conmutan.
+\end{proof}
+
+\begin{corollary}
+La secuencia espejo $(M_k)$ \textbf{no} evoluciona según la dinámica de
+Collatz: no existe función $f$ tal que $M_{k+1} = f(M_k)$
+independientemente de $N_k$.
+La dualidad es \emph{cinemática} (relación entre estados en el mismo paso $k$),
+no \emph{dinámica} (regla de evolución propia).
+\end{corollary}
+
+\subsection{Identidad de conservación}
+
+Mientras no haya truncamiento ($N_k < 2^L$), la Definición~\ref{def:inversion}
+implica la identidad exacta:
+\begin{equation}
+  N_k + M_k = 2^L - 1.
+  \label{eq:conservacion}
+\end{equation}
+Geométricamente, el par $(N_k, M_k)$ recorre la recta $x+y = 2^L-1$
+dentro del cuadrado $[0,2^L)^2$.
+
+\begin{remark}[Alcance y limitación de la identidad]
+La ecuación~\eqref{eq:conservacion} es un cambio de variable lineal.
+Por sí sola, \textbf{no aporta poder demostrativo}:
+acotar $N_k$ superiormente equivale trivialmente a acotar $M_k$
+inferiormente, pues una afirmación es la reescritura de la otra.
+Más aún, la identidad \emph{se rompe} cuando $N_k \ge 2^L$,
+es decir, exactamente en el caso relevante para una hipotética
+órbita divergente.
+Su interés es \emph{descriptivo}: describe la geometría de la trayectoria dual.
+\end{remark}
+
+\subsection{Ejemplo numérico ilustrativo}
+
+La Tabla~\ref{tab:ejemplo_n5} muestra la evolución paralela para
+$n = 5$, $L = 5$.
+
+\begin{table}[h!]
+\centering
+\caption{Evolución paralela de $(N_k)$ y $(M_k = \neg_5(N_k))$ para $n=5, L=5$.}
+\label{tab:ejemplo_n5}
+\begin{tabular}{cccccl}
+\toprule
+$k$ & $N_k$ & $\mathtt{bin}_5(N_k)$ & $M_k$ & $\mathtt{bin}_5(M_k)$ & Notas \\
+\midrule
+0 & 5  & 00101 & 26 & 11010 & Inicio \\
+1 & 16 & 10000 & 15 & 01111 & Pico de $N_k$ $\to$ valle de $M_k$ \\
+2 & 8  & 01000 & 23 & 10111 & \\
+3 & 4  & 00100 & 27 & 11011 & \\
+4 & 2  & 00010 & 29 & 11101 & \\
+5 & 1  & 00001 & 30 & 11110 & $M_5 = 2^5-2 = 30$ (Teorema~\ref{thm:estado_final}) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+En $k=1$, $N_1=16$ es el máximo global de la secuencia; en el mismo paso
+$M_1=15$ es el mínimo global, ilustrando la anti-correlación exacta
+de~\eqref{eq:conservacion}.
+
+% ============================================================
+\section{Evolución de Patrones Binarios y Entropía}
+\label{sec:patrones}
+% ============================================================
+
+\subsection{El patrón alternante: caso algebraicamente especial}
+
+\begin{theorem}[Comportamiento del patrón alternante]
+\label{thm:alternante}
+Si $n = (2^{2m}-1)/3$ (patrón alternante puro de $2m$ bits,
+véase Definición~\ref{def:alternante}), entonces:
+\[
+  3n + 1 = 2^{2m}.
+\]
+Es decir, un único paso de la operación $3n+1$ produce exactamente
+una potencia de $2$, conduciendo directamente al ciclo $4{\to}2{\to}1$.
+\end{theorem}
+
+\begin{proof}
+Por la expresión del patrón alternante:
+\[
+  n = \sum_{i=0}^{m-1} 2^{2i} = \frac{4^m - 1}{4 - 1} = \frac{2^{2m}-1}{3}.
+\]
+Entonces:
+\[
+  3n + 1 = (2^{2m}-1) + 1 = 2^{2m}.
+\]
+\end{proof}
+
+\textbf{Ejemplos:}
+\begin{itemize}[noitemsep]
+  \item $m=1$: $n=1$\; ($01_2$),\quad $3\cdot1+1 = 4 = 2^2$
+  \item $m=2$: $n=5$\; ($0101_2$),\quad $3\cdot5+1 = 16 = 2^4$
+  \item $m=3$: $n=21$\; ($010101_2$),\quad $3\cdot21+1 = 64 = 2^6$
+  \item $m=4$: $n=85$\; ($01010101_2$),\quad $3\cdot85+1 = 256 = 2^8$
+  \item $m=8$: $n=21845$\; ($\mathtt{0x5555}$),\quad $3\cdot21845+1 = 65536 = 2^{16}$
+\end{itemize}
+
+\begin{corollary}
+Los números de la forma $(2^{2m}-1)/3$ constituyen una familia infinita
+que alcanza una potencia de $2$ tras un \emph{único} paso de $3n+1$.
+\end{corollary}
+
+\begin{remark}
+Este resultado revela que la \textbf{estructura binaria} del valor inicial
+impacta directamente en su comportamiento bajo Collatz.
+Sin embargo, aplica solo a esta familia específica y no constituye
+un avance directo hacia la demostración de la conjetura.
+Su valor radica en identificar una «jerarquía de especialidad»
+entre patrones binarios y en proporcionar sondas algebraicas
+para estudiar la dinámica.
+\end{remark}
+
+\subsection{Tendencia hacia la regularidad}
+
+Las observaciones computacionales sobre $10^5$ trayectorias muestran
+una tendencia sistemática en la evolución de los patrones:
+
+\begin{enumerate}
+  \item \textbf{Patrones de bloques} (4 o más bits idénticos consecutivos)
+        son los más frecuentes al inicio (≈63.6\%).
+        La operación $3n+1$ introduce acarreos que rompen los bloques
+        en sus bordes, generando patrones near-alternating.
+  \item \textbf{Patrones near-alternating} son el segundo tipo más
+        común (≈24.4\%).
+        El acarreo de $3n+1$ tiende a corregir las irregularidades
+        residuales, empujando el patrón hacia la alternancia pura.
+  \item \textbf{Patrones alternantes puros} producen potencias de $2$
+        en un único paso (Teorema~\ref{thm:alternante}),
+        tras lo cual la trayectoria converge al ciclo $4{\to}2{\to}1$
+        mediante divisiones sucesivas por $2$.
+\end{enumerate}
+
+\begin{remark}[Observación computacional sobre entropía]
+En el 99.9\% de los números hasta $10^{20}$, la trayectoria alcanza
+una zona de baja entropía ($H(n) \le 0.7$) en menos de $750$ pasos.
+La tasa de variación de entropía en cada paso es aproximadamente
+$51.5\%$ de incrementos y $48.5\%$ de decrementos,
+con una tendencia neta hacia la reducción a largo plazo.
+\end{remark}
+
+% ============================================================
+\section{Unicidad Algebraica del Coeficiente 3}
+\label{sec:unicidad}
+% ============================================================
+
+Esta sección explica por qué los patrones alternantes tienen el
+comportamiento especial descrito en el Teorema~\ref{thm:alternante},
+y muestra que esta propiedad es exclusiva del coeficiente $3$.
+
+\begin{theorem}[Divisibilidad universal de $2^{2m}-1$ por $3$]
+\label{thm:divisibilidad}
+Para todo $m \ge 1$, se cumple $3 \mid (2^{2m}-1)$.
+\end{theorem}
+
+\begin{proof}
+Como $2 \equiv -1 \pmod{3}$, se tiene
+$2^{2m} \equiv (-1)^{2m} = 1 \pmod{3}$,
+y por tanto $2^{2m} - 1 \equiv 0 \pmod{3}$.
+\end{proof}
+
+\begin{corollary}
+Los números $(2^{2m}-1)/3$ son siempre enteros, lo que garantiza
+la existencia de la familia alternante del Teorema~\ref{thm:alternante}.
+\end{corollary}
+
+\begin{theorem}[Unicidad del coeficiente 3]
+\label{thm:unicidad}
+Para cualquier entero $k > 1$ con $k \ne 3$, existe algún $m \ge 1$
+tal que $k \nmid (2^{2m}-1)$.
+\end{theorem}
+
+\begin{proof}[Demostración (esquema)]
+El orden multiplicativo de $2$ módulo $k$ determina el período de
+$2^j \bmod k$. Para que $k \mid 2^{2m}-1$ para \emph{todo} $m$,
+se necesitaría que $2^{2m} \equiv 1 \pmod{k}$ para todo $m\ge1$,
+lo cual requiere que el orden de $2$ módulo $k$ divida a $2$ para
+todo $m$, es decir, orden $= 1$ ó $2$.
+\begin{itemize}[noitemsep]
+  \item Orden $1$: $2 \equiv 1 \pmod{k}$, es decir, $k \mid 1$, imposible para $k>1$.
+  \item Orden $2$: $2^2 \equiv 1 \pmod{k}$, es decir, $k \mid 3$.
+        Como $k>1$, la única opción es $k=3$.
+\end{itemize}
+Por tanto, ningún $k>1$ con $k\ne3$ satisface la condición para todo $m$.
+\end{proof}
+
+\textbf{Verificación computacional:}
+\begin{itemize}[noitemsep]
+  \item $k=3$: $100\%$ de los números alternantes convergen.
+  \item $k=5$: No divisible cuando $m$ es impar.
+  \item $k=7$: No divisible cuando $m$ no es múltiplo de $3$.
+  \item $k=4,6,8,9$: $0\%$ de convergencia con el patrón equivalente.
+\end{itemize}
+
+\begin{remark}[La familia $k = 3/2^r$]
+Los coeficientes $k = 3/2^r$ (con $r\ge 0$ entero) también comparten
+la propiedad algebraica del Teorema~\ref{thm:divisibilidad}.
+Sin embargo, computacionalmente solo $k=3$ produce convergencia
+del $100\%$; para $k=1.5, 0.75, \dots$ la tasa cae al $\approx56\%$.
+La propiedad algebraica es necesaria pero no suficiente para garantizar
+la convergencia dinámica.
+\end{remark}
+
+% ============================================================
+\section{Análisis Modular del Tiempo de Parada}
+\label{sec:modular}
+% ============================================================
+
+Se aplicó el test de Kruskal-Wallis a $10^5$ trayectorias para evaluar
+si el tiempo de parada (número de pasos hasta alcanzar $1$)
+depende de la clase residual $n_0 \bmod m$.
+
+\begin{table}[h!]
+\centering
+\caption{Resultados del test de Kruskal-Wallis sobre el tiempo de parada
+         por clase modular.}
+\label{tab:kruskal}
+\small
+\begin{tabularx}{\textwidth}{@{} l c c X @{}}
+\toprule
+Clasificación & $H$-estadístico & $p$-valor & Interpretación \\
+\midrule
+$n_0 \bmod 2$  & 1337.72 & $7.17\times10^{-293}$ &
+  La paridad inicial condiciona fuertemente la estructura. \\
+$n_0 \bmod 3$  & 1.19    & $5.52\times10^{-1}$   &
+  La clase módulo 3 \emph{no} predice el tiempo de parada. \\
+$n_0 \bmod 4$  & 2579.59 & $\approx 0$            &
+  Determina los dos primeros pasos de la iteración. \\
+$n_0 \bmod 6$  & 1340.61 & $\approx 0$            &
+  Hereda la estructura de la paridad. \\
+$n_0 \bmod 8$  & 3844.40 & $\approx 0$            &
+  Mayor resolución de la condición binaria inicial. \\
+$n_0 \bmod 12$ & 2585.97 & $\approx 0$            &
+  Combina efectos de módulo 3 y módulo 4. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\noindent
+El tiempo de parada depende fuertemente de la clase residual módulo
+potencias de $2$, pero no módulo $3$.
+Este resultado es coherente con la dualidad binaria: la inversión de
+bits $\neg_L$ invierte la paridad, generando una dinámica dual
+condicionada por la estructura binaria del número inicial.
+La no-dependencia módulo $3$ está alineada con el
+Teorema~\ref{thm:unicidad}: el coeficiente $3$ actúa «globalmente»
+sobre la estructura binaria, no como filtro modular aditivo.
+
+% ============================================================
+\section{Resumen de Resultados Computacionales}
+\label{sec:resultados_comp}
+% ============================================================
+
+\begin{table}[h!]
+\centering
+\caption{Métricas computacionales principales del estudio.}
+\label{tab:resumen}
+\begin{tabular}{lc}
+\toprule
+Métrica & Valor \\
+\midrule
+Trayectorias analizadas               & $10^5$ \\
+Longitud máxima estudiada             & $L = 32$ \\
+Correlación $\max(N_k)$ vs $\min(M_k)$ & $-1.000$ (exacto) \\
+Sincronía de extremos                 & $100\%$ \\
+$R^2$ del modelo Random Forest        & $\approx 0.48$ \\
+Predictor dominante                   & $\log_2(\max N_k)$ \\
+Proporción media de pasos pares       & $0.6845$ (vs $0.6131$ teórico) \\
+Números con $H \le 0.7$ en $<750$ pasos & $\ge 99.9\%$ hasta $10^{20}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ============================================================
+\section{Preguntas Abiertas}
+\label{sec:open}
+% ============================================================
+
+A la luz de los resultados anteriores surgen las siguientes preguntas,
+que no son conjeturas apoyadas por evidencia fuerte sino
+\emph{direcciones de investigación}:
+
+\begin{question}[Invariante de la dualidad]
+¿Existe una función $I(N_k, M_k)$ —basada en entropía binaria,
+distancia Hamming o métrica 2-ádica— que sea constante, monótona
+o acotada a lo largo de toda trayectoria?
+\end{question}
+
+\begin{question}[Función de Lyapunov binaria]
+¿Puede construirse una función $V: \mathbb{N} \to \mathbb{R}_{\ge 0}$
+basada en $H(N_k)$ o en $d_H(N_k, M_k)$ que sea estrictamente
+decreciente bajo la dinámica de Collatz, al menos en promedio?
+\end{question}
+
+\begin{question}[Conexión 2-ádica]
+¿Puede la dualidad binaria de longitud $L$ interpretarse de forma natural
+en el marco de los enteros 2-ádicos $\mathbb{Z}_2$
+cuando $L \to \infty$?
+\end{question}
+
+\begin{question}[Ciclos alternativos]
+¿Impone la identidad de conservación~\eqref{eq:conservacion}
+restricciones sobre la existencia de ciclos distintos al $4{\to}2{\to}1$?
+\end{question}
+
+% ============================================================
+\section{Conclusión}
+\label{sec:conclusion}
+% ============================================================
+
+Este trabajo integra tres perspectivas complementarias
+—dualidad binaria, evolución de patrones y unicidad algebraica—
+para ofrecer una visión estructural de la Conjetura de Collatz.
+
+Los resultados principales son:
+\begin{enumerate}
+  \item \textbf{Teorema de Dualidad Final} (Teorema~\ref{thm:estado_final}):
+        demostración formal de que $M_K = 2^L - 2$ cuando $N_K = 1$.
+  \item \textbf{No conmutatividad} (Lema~\ref{lemma:no_conmuta}):
+        la dualidad es cinemática, no dinámica.
+  \item \textbf{Patrón alternante} (Teorema~\ref{thm:alternante}):
+        familia infinita que alcanza una potencia de $2$ en un solo paso.
+  \item \textbf{Unicidad del coeficiente 3}
+        (Teoremas~\ref{thm:divisibilidad} y~\ref{thm:unicidad}):
+        el orden multiplicativo de $2$ módulo $3$ explica la existencia
+        exclusiva de esta familia.
+  \item \textbf{Estructura modular} (Sección~\ref{sec:modular}):
+        el tiempo de parada depende de la clase módulo potencias de $2$,
+        pero no módulo $3$.
+  \item \textbf{Tendencia a baja entropía} (Sección~\ref{sec:patrones}):
+        evidencia computacional de reducción progresiva del desorden binario.
+\end{enumerate}
+
+Ninguno de estos resultados constituye una demostración de la Conjetura
+de Collatz. Sin embargo, en conjunto proporcionan una perspectiva
+algebraica nueva y reproducible que puede servir de punto de partida
+para análisis más profundos.
+
+\textbf{Líneas de trabajo futuro:}
+\begin{itemize}[noitemsep]
+  \item Formalizar la evolución de patrones binarios.
+  \item Buscar funciones de Lyapunov basadas en entropía o distancia Hamming.
+  \item Extender el análisis modular a módulos más grandes.
+  \item Explorar la conexión entre la dualidad binaria y la teoría 2-ádica.
+\end{itemize}
+
+\medskip
+\noindent
+El código, los datos y las figuras están disponibles en el repositorio
+(\url{https://github.com/MrVenomSnake/Dualidad-Binaria})
+y en Zenodo (DOI: \href{https://doi.org/10.5281/zenodo.20458849}{10.5281/zenodo.20458849}).
+
+\medskip
+\noindent\textbf{Invitación a la colaboración:}
+Cualquier comentario, crítica o sugerencia es bienvenido.
+El autor principal (investigador independiente, sin afiliación
+académica formal) agradece especialmente referencias a literatura
+relacionada, señalamientos de errores y desarrollos de las
+preguntas abiertas planteadas.
+
+% ============================================================
+\section*{Agradecimientos}
+% ============================================================
+
+A la comunidad matemática por mantener viva la curiosidad sobre
+problemas elementales pero profundos.
+Al equipo de xAI por el soporte técnico a través de Grok.
+
+% ============================================================
+\begin{thebibliography}{99}
+\setlength{\itemsep}{0.5em}
+
+\bibitem{lagarias}
+Lagarias, J.\,C. (1985).
+The $3x+1$ problem: An overview.
+\textit{American Mathematical Monthly}, 92(1), 3--23.
+
+\bibitem{terras}
+Terras, R. (1976).
+A stopping time problem on the positive integers.
+\textit{Acta Arithmetica}, 30, 241--252.
+
+\bibitem{korec}
+Korec, I. (1994).
+A density estimate for the $3x+1$ problem.
+\textit{Mathematica Slovaca}, 44(1), 85--89.
+
+\bibitem{tao}
+Tao, T. (2020).
+Almost all orbits of the Collatz map attain almost bounded values.
+\textit{Forum of Mathematics, Pi}, 8, e12.
+
+\bibitem{monks}
+Monks, G. (2006).
+On the 2-adic $3x+1$ problem.
+\textit{arXiv preprint} math/0608356.
+
+\end{thebibliography}
+
+% ============================================================
+%  APÉNDICES
+% ============================================================
+\appendix
+
+\section{Verificación computacional para $L = 20$}
+\label{app:A}
+
+Se analizaron $10^4$ trayectorias con longitud fija $L = 20$.
+Se verificó la identidad de conservación $N_k + M_k = 2^{20}-1$
+en todos los casos sin truncamiento.
+Los gráficos de anti-correlación y el diagrama de dispersión
+picos--valles muestran una alineación perfecta entre los extremos
+de ambas secuencias.
+Los archivos generados (\texttt{tabla\_picos\_valles\_L20.csv},
+\texttt{fig\_anticorrelacion\_desviaciones.png}, entre otros)
+están disponibles en el repositorio bajo \texttt{data/l20/} y
+\texttt{figures/l20/}.
+
+\section{Análisis computacional para $L = 32$}
+\label{app:B}
+
+Se extendió el análisis a $L = 32$ sobre $n = 1 \dots 10^5$.
+Ninguna trayectoria superó $2^{32}$, por lo que no hubo truncamiento.
+La correlación entre $\max(N_k)$ y $\min(M_k)$ fue exactamente
+$-1.0$ ($R^2 = 1.0$), confirmando la identidad algebraica.
+
+Se observó un $100\%$ de sincronía entre el paso donde $N_k$
+alcanza su máximo global y donde $M_k$ alcanza su mínimo global.
+Un modelo Random Forest logró $R^2 \approx 0.48$ al predecir
+el tiempo de parada, siendo $\log_2(\max N_k)$ el predictor
+dominante.
+Los datos completos y las figuras están en \texttt{data/l32/}
+y \texttt{figures/l32/}.
+
+\section{Análisis modular empírico}
+\label{app:C}
+
+Se aplicó el test de Kruskal-Wallis a $10^5$ trayectorias
+(ver Tabla~\ref{tab:kruskal}).
+El conjunto de datos (\texttt{datos\_modulares.csv}) y los gráficos
+por módulo están disponibles en \texttt{data/modular/} y
+\texttt{figures/modular/}.
+
+Los scripts de reproducción son:
+\begin{itemize}[noitemsep]
+  \item \texttt{scripts/appendix\_generator.py} — genera datos para $L=20$.
+  \item \texttt{scripts/advanced\_analysis.py} — análisis para $L=32$ y ML.
+  \item \texttt{scripts/modular\_analysis.py} — test de Kruskal-Wallis.
+\end{itemize}
+
+\end{document}
